@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Web App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9/dist/Chart.min.js"></script>
+</head>
+<body>
+    <div id="heading"><h1 id="title">Sentiment Analysis Project</h1></div>
+    <nav>
+        <ul>
+         
+            <li><a href="#" onclick="showSection('upload')">Upload File</a></li>
+            <li><a href="#" onclick="showSection('custom-test')">Custom Test</a></li>
+        </ul>
+    </nav>
+
+    <div id="about" >
+        <h1>About Us</h1>
+        <div class="about-content">
+            <p>Welcome to the Sentiment Analysis Web App. Our application leverages advanced sentiment analysis techniques to provide insights into the sentiments expressed in movie reviews. Here’s what you can do:</p>
+            <ul>
+                <li><strong>Analyze Sentiment:</strong> Utilize our trained models to assess the sentiment of movie reviews.</li>
+                <li><strong>Visualize Results:</strong> Generate visualizations like charts and word clouds to understand sentiment trends.</li>
+                <li><strong>Interactive Testing:</strong> Test custom text inputs to see real-time sentiment analysis results.</li>
+            </ul>
+            <p>This tool aims to enhance your understanding of public sentiment and help you make data-driven decisions based on textual data.</p>
+        </div>
+    </div>
+
+    <section id="upload" class="section hidden">
+        <h1>Upload Reviews File</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Upload</button>
+        </form>
+
+       <div id="spinner-upload" class="spinner hidden"></div>
+
+
+        <div id="file-results">
+            <h2>Results</h2>
+            <img id="wordcloud" alt="Word Cloud">
+            <img id="pie-chart" alt="Pie Chart"> <!-- Display Pie Chart -->
+        </div>
+    </section>
+
+    <section id="custom-test" class="section hidden">
+        <h1>Custom Test</h1>
+        <textarea id="custom-text" placeholder="Enter your text here..."></textarea>
+        <button id="submit-custom-text" onclick="showExplanation()">Analyze</button>
+        <div id="sentiment"></div>
+        <div class="chart-container">
+            <div>
+                <h3 >Pie Chart</h3>
+                <canvas id="myPieChart" width="400" height="400"></canvas>
+            </div>
+            <div>
+                <h3>Bar Graph</h3>
+                <canvas id="myBarChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <div class="container">
+            <div class="header">
+                <h1 class="explanation">Understanding Sentiment Scores</h1>
+            </div>
+    
+            <div class="explanation compound">
+                <h2>Compound Score</h2>
+                <p>The <strong>compound score</strong> is the overall sentiment score, ranging from -1 (most negative) to +1 (most positive). It combines the effect of all the words in the text and represents the overall sentiment.</p>
+            </div>
+    
+            <div class="explanation positive">
+                <h2>Positive (Pos)</h2>
+                <p>The <strong>pos</strong> score is the probability (between 0 and 1) that the sentiment of the text is positive. A higher value indicates a stronger positive sentiment.</p>
+            </div>
+    
+            <div class="explanation negative">
+                <h2>Negative (Neg)</h2>
+                <p>The <strong>neg</strong> score is the probability (between 0 and 1) that the sentiment is negative. A higher value indicates a stronger negative sentiment.</p>
+            </div>
+    
+            <div class="explanation neutral">
+                <h2>Neutral (Neu)</h2>
+                <p>The <strong>neu</strong> score represents the probability (between 0 and 1) that the sentiment is neutral, meaning the text has no strong positive or negative sentiment.</p>
+            </div>
+        </div>
+    </section>
+
+    <div>
+
+    </div>
+    <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+</body>
+</html>
