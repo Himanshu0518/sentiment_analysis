@@ -13,9 +13,10 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+import os
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 app = Flask(__name__)
 model = load_model('movie_reviews_model.keras')
