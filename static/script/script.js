@@ -2,7 +2,7 @@
 about = document.getElementById("about") ;
 
 function showSection(sectionId) {
-    about.remove('active')
+    about.classList.remove('active')
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active') ;
     });

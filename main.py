@@ -20,6 +20,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 app = Flask(__name__)
 model = load_model('movie_reviews_model.keras')
+app.config['UPLOAD_FOLDER'] = 'uploads'  # Define where files are stored
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit file size to 16 MB
 
 
 nltk.download('stopwords')
