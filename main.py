@@ -22,7 +22,7 @@ app = Flask(__name__)
 model = load_model('movie_reviews_model.keras')
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Define where files are stored
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit file size to 16 MB
-
+app.config['TF_ENABLE_ONEDNN_OPTS'] = 0 
 
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
