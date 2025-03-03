@@ -5,37 +5,42 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import io
 import base64
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+import tensorflow 
+from tensorflow import keras
+from keras.models import load_model
+from keras.preprocessing.sequence import pad_sequences
+import pickle
 import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 import os
-
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+# Disable GPU for TensorFlow (optional)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 app = Flask(__name__)
+
+# Load pre-trained model
 model = load_model('movie_reviews_model.keras')
-app.config['UPLOAD_FOLDER'] = 'uploads'  # Define where files are stored
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit file size to 16 MB
 app.config['TF_ENABLE_ONEDNN_OPTS'] = 0 
 
+# Load NLTK resources
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 ps = PorterStemmer()
 
+# Load pre-trained tokenizer
+with open('tokenizer.pkl', 'rb') as handle:
+    tokenizer = pickle.load(handle)
 
-tokenizer = Tokenizer(num_words = 5000, oov_token="<OOV>")
+# Define max_length (should match the value used during training)
 max_length = 100
 
 # Preprocessing function (includes HTML tag removal, stopwords, stemming)
 def preprocess_text(text):
-  #  text = BeautifulSoup(text, "html.parser").get_text()  # Remove HTML tags
-    text = re.sub('[^a-zA-Z]',' ', text)  # Remove punctuation
+    text = re.sub('[^a-zA-Z]', ' ', text)  # Remove punctuation
     text = text.lower()
     
     # Remove stopwords and apply stemming
@@ -50,21 +55,24 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
-        file = request.files['file'] 
-        data = pd.read_csv(file,engine='python') 
-        reviews = data['Reviews'].apply(preprocess_text)
-        tokenizer.fit_on_texts(reviews) 
+        file = request.files['file']
+        data = pd.read_csv(file, engine='python') 
+        data.head()
 
+        if 'Reviews' not in data.columns:
+           print('no Review Col')
+
+        reviews = data['Reviews'].dropna().apply(preprocess_text)
+
+        # Use pre-trained tokenizer (DO NOT fit a new tokenizer)
         sequences = tokenizer.texts_to_sequences(reviews)
-        padded_sequences = pad_sequences(sequences, maxlen=max_length ,  padding='post', truncating='post')
+        padded_sequences = pad_sequences(sequences, maxlen=max_length, padding='post', truncating='post')
+
         predictions = model.predict(padded_sequences)
-       
-        print("Predictions:", predictions)
 
         pos_reviews = np.sum(predictions > 0.5)
         neg_reviews = np.sum(predictions <= 0.5)
 
-        
         # Generate WordCloud
         text = ' '.join(reviews)
         wordcloud = WordCloud(width=800, height=400).generate(text)
@@ -90,27 +98,34 @@ def upload_file():
         pie_chart_url = base64.b64encode(pie_img.getvalue()).decode()
 
         return jsonify({
-            'wordcloud': wordcloud_url ,
+            'wordcloud': wordcloud_url,
             'pie_chart': pie_chart_url
         })
-    except Exception as e:
-        return jsonify({'error': str(e)})
 
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)})
 
 @app.route('/predict', methods=['POST'])
 def predict_sentiment():
-    text = request.form['custom-text']
+    try:
+        text = request.form['custom-text']
+        print(text)
+        if not text.strip():
+            return jsonify({'error': "Please enter valid text for sentiment analysis."})
 
-    
-    analyzer = SentimentIntensityAnalyzer()
-    sentiment_scores  = analyzer.polarity_scores(text)  
-    sentiment_result = {
-        'positive': sentiment_scores['pos'],
-        'negative': sentiment_scores['neg'],
-        'neutral': sentiment_scores['neu'],
-        'compound': sentiment_scores['compound']
-    }
-    return jsonify({'sentiment': sentiment_result})
+        analyzer = SentimentIntensityAnalyzer()
+        sentiment_scores = analyzer.polarity_scores(text)
+        sentiment_result = {
+            'positive': sentiment_scores['pos'],
+            'negative': sentiment_scores['neg'],
+            'neutral': sentiment_scores['neu'],
+            'compound': sentiment_scores['compound']
+        }
+        return jsonify({'sentiment': sentiment_result})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
