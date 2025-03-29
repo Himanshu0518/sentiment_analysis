@@ -12,26 +12,28 @@ function showSection(sectionId) {
 
 document.getElementById('upload-form').addEventListener('submit', async function (event) {
     event.preventDefault();
-   
     const formData = new FormData(this);
-
     try {
-      
         const response = await fetch('/upload', {
             method: 'POST',
             body: formData
         });
-
-       
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
         const data = await response.json();
-        document.getElementById('wordcloud').src = 'data:image/png;base64,' + data.wordcloud;
-        document.getElementById('pie-chart').src = 'data:image/png;base64,' + data.pie_chart;
-
+        if (data.wordcloud && data.pie_chart) {
+            document.getElementById('wordcloud').src = 'data:image/png;base64,' + data.wordcloud;
+            document.getElementById('pie-chart').src = 'data:image/png;base64,' + data.pie_chart;
+        } else {
+            throw new Error('Invalid JSON response: Missing expected properties.');
+        }
     } catch (error) {
-       
         console.error('Error:', error);
+        // Optionally display the error to the user
     }
 });
+
 
 document.getElementById('submit-custom-text').addEventListener('click', async function() {
     const customText = document.getElementById('custom-text').value;
