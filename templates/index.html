@@ -24,7 +24,8 @@
             <div id="text-analysis" class="tab-content active">
                 <div class="card">
                     <h2>Analyze Custom Text</h2>
-                    <form id="text-form">
+                    <form id="text-form" action="/predict" method="POST">
+
                         <div class="form-group">
                             <textarea id="custom-text" name="custom-text" rows="6" placeholder="Enter text to analyze sentiment..."></textarea>
                         </div>
@@ -69,7 +70,8 @@
                     <h2>Analyze CSV File</h2>
                     <p class="instruction">Upload a CSV file with a 'Reviews' column containing text to analyze</p>
                     
-                    <form id="upload-form" enctype="multipart/form-data">
+                    <form id="upload-form" action="/upload" enctype="multipart/form-data" method="POST">
+
                         <div class="form-group file-input-container">
                             <input type="file" id="file-upload" name="file" accept=".csv" class="file-input">
                             <label for="file-upload" class="file-label">
