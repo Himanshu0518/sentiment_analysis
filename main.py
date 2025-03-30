@@ -53,7 +53,7 @@ def preprocess_text(text):
 def index():
     return render_template('index.html')
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST','GET'])
 def upload_file():
     try:
         file = request.files['file']
