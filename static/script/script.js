@@ -9,6 +9,7 @@ function showSection(sectionId) {
     document.getElementById(sectionId).classList.add('active');
 }
 
+  
 
 document.getElementById('upload-form').addEventListener('submit', async function (event) {
     event.preventDefault();
@@ -119,20 +120,24 @@ document.getElementById('submit-custom-text').addEventListener('click', async fu
     }
 });
 
-document.getElementById('upload-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-
-    document.getElementById('spinner-upload').classList.remove('hidden');
-
-
-    setTimeout(function() {
-        
-        document.getElementById('spinner-upload').classList.add('hidden');
-      
-        document.getElementById('file-results').style.display = 'block';
-    }, 4000);  
-});
+document.addEventListener("DOMContentLoaded", function () {
+    const submitCustomText = document.getElementById('submit-custom-text');
+    const spinnerCustom = document.getElementById('spinner-custom');
+    const sentimentElem = document.getElementById('sentiment');
+  
+    if (submitCustomText && spinnerCustom && sentimentElem) {
+      submitCustomText.addEventListener('click', function() {
+        spinnerCustom.classList.remove('hidden');
+  
+        setTimeout(function() {
+          spinnerCustom.classList.add('hidden');
+          sentimentElem.innerText = 'Positive Sentiment';
+        }, 3000);
+      });
+    } else {
+      console.error('One or more required elements (submit button, spinner, or sentiment display) are missing.');
+    }
+  });
 
 document.getElementById('submit-custom-text').addEventListener('click', function() {
    
